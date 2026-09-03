@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from engineering_experiment_design import estimate_effects, full_factorial
+from engineering_experiment_design import add_two_factor_interactions, estimate_effects, full_factorial
 
 
 def test_two_factor_design_has_four_coded_runs():
@@ -15,6 +15,13 @@ def test_effect_estimation_recovers_coded_linear_model():
     _, design = full_factorial(["a", "b"])
     response = 10 + 2 * design[:, 0] - 3 * design[:, 1]
     assert estimate_effects(design, response) == pytest.approx([10, 2, -3])
+
+
+def test_two_factor_interactions_are_appended_as_coded_columns():
+    _, design = full_factorial(["a", "b", "c"])
+    expanded = add_two_factor_interactions(design)
+    assert expanded.shape == (8, 6)
+    assert expanded[0, 3:].tolist() == [1.0, 1.0, 1.0]
 
 
 def test_factor_names_must_be_unique():

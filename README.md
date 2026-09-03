@@ -8,7 +8,9 @@ The package generates a complete \(2^k\) design with coded levels `-1` and `+1`.
 
 \[
  y = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k + \epsilon
-\]
+ \]
+
+For model-building experiments, `add_two_factor_interactions` appends the pairwise coded interaction columns. This is an explicit design-matrix operation; it does not automatically claim that an interaction is statistically significant.
 
 This first version deliberately excludes automatic claims about significance, causality, or optimality. Replication, randomization, blocking, interaction terms, residual analysis, and engineering constraints must be considered in the study plan.
 
