@@ -33,3 +33,25 @@ def add_two_factor_interactions(design: np.ndarray) -> np.ndarray:
         raise ValueError("design must be a 2-D array with at least two factors")
     interactions = [x[:, i] * x[:, j] for i in range(x.shape[1]) for j in range(i + 1, x.shape[1])]
     return np.column_stack([x, *interactions])
+
+
+def decode_coded_design(
+    design: np.ndarray,
+    low_levels: list[float] | tuple[float, ...] | np.ndarray,
+    high_levels: list[float] | tuple[float, ...] | np.ndarray,
+) -> np.ndarray:
+    """Convert a ``-1``/``+1`` coded design into physical factor levels."""
+    coded = np.asarray(design, dtype=float)
+    lows = np.asarray(low_levels, dtype=float)
+    highs = np.asarray(high_levels, dtype=float)
+    if coded.ndim != 2 or coded.shape[1] != len(lows) or len(lows) != len(highs):
+        raise ValueError("design columns must match low_levels and high_levels")
+    if not np.isfinite(coded).all() or not np.isfinite(lows).all() or not np.isfinite(highs).all():
+        raise ValueError("design levels must be finite")
+    if np.any(~np.isin(coded, (-1.0, 1.0))):
+        raise ValueError("design must contain only -1 and +1 coded levels")
+    if np.any(highs <= lows):
+        raise ValueError("each high level must be greater than its low level")
+    centers = (highs + lows) / 2.0
+    half_ranges = (highs - lows) / 2.0
+    return centers + coded * half_ranges
